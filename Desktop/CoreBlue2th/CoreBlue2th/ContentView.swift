@@ -16,8 +16,11 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
-            List(contentVM.peripheralNames, id: \.self) { peripheral in
-                Text(peripheral)
+                List(contentVM.peripherals, id: \.self) { peripheral in
+                    Text(peripheral.name ?? "Unnamed Device")
+                        .onTapGesture {
+                            contentVM.didSelectPeripheral(peripheral)
+                        }
             }
                 Button {
                     self.audioPlayer.play()

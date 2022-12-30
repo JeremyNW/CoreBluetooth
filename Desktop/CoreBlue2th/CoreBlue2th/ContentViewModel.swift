@@ -11,13 +11,19 @@ import CoreBluetooth
 class ContentViewModel: NSObject, ObservableObject {
   
     private var centralManager: CBCentralManager?
-    private var peripherals: [CBPeripheral] = []
-    @Published var peripheralNames: [String] = []
+    @Published var peripherals: [CBPeripheral] = []
+    private var selectedPeripheral: CBPeripheral?
     
     override init() {
         super.init()
         self.centralManager = CBCentralManager(delegate: self, queue: .main)
         
+    }
+
+    func didSelectPeripheral(_ peripheral: CBPeripheral) {
+        self.selectedPeripheral = peripheral
+        centralManager?.connect(peripheral)
+        centralManager?.stopScan()
     }
     
 }
@@ -32,7 +38,14 @@ extension ContentViewModel: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         if !peripherals.contains(peripheral) {
             self.peripherals.append(peripheral)
-            self.peripheralNames.append(peripheral.name ?? "unnamed device")
         }
+    }
+    
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        print("did connect")
+    }
+    
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        print("could not connect")
     }
 }
