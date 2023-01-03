@@ -11,7 +11,7 @@ import AVFoundation
 struct ContentView: View {
     @ObservedObject private var contentVM = ContentViewModel()
     @State private var audioPlayer: AVAudioPlayer!
-    
+    @State private var isConnecting = false
     
     var body: some View {
         NavigationView {
@@ -20,6 +20,7 @@ struct ContentView: View {
                     Text(peripheral.name ?? "Unnamed Device")
                         .onTapGesture {
                             contentVM.didSelectPeripheral(peripheral)
+                          
                         }
             }
                 Button {

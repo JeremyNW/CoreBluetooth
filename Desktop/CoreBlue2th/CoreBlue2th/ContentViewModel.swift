@@ -14,6 +14,7 @@ class ContentViewModel: NSObject, ObservableObject {
     @Published var peripherals: [CBPeripheral] = []
     private var selectedPeripheral: CBPeripheral?
     
+    
     override init() {
         super.init()
         self.centralManager = CBCentralManager(delegate: self, queue: .main)
@@ -42,10 +43,32 @@ extension ContentViewModel: CBCentralManagerDelegate {
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        peripheral.delegate = self
         print("did connect")
+        peripheral.discoverServices(nil)
+        
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         print("could not connect")
+    }
+}
+
+extension ContentViewModel: CBPeripheralDelegate {
+    
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        guard let services = peripheral.services else { return }
+
+        for service in services {
+            peripheral.discoverCharacteristics(nil, for: service)
+        }
+    }
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        guard let characteristics = service.characteristics else { return }
+                print(service)
+               // Iterate over the characteristics and print their UUIDs
+               for characteristic in characteristics {
+                   print(characteristic)
+               }
     }
 }
